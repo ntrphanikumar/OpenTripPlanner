@@ -13,7 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.routing.alertpatch.Alert;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.updater.GraphUpdater;
@@ -45,15 +45,27 @@ public class AlertsResource {
     public static final class AlertDTO {
     	private String header, description;
     	private Date start, end;
-    	AlertDTO(Alert alert) {
-    		header = alert.alertHeaderText.toString();
-    		description = alert.alertDescriptionText.toString();
-    		start = alert.effectiveStartDate;
-    		end = alert.effectiveEndDate;
+    	private String route, trip, stop;
+    	private AlertDTO(AlertPatch patch) {
+    		header = patch.getAlert().alertHeaderText.toString();
+    		description = patch.getAlert().alertDescriptionText.toString();
+    		start = patch.getAlert().effectiveStartDate;
+    		end = patch.getAlert().effectiveEndDate;
+    		
+			route = strVal(patch.getRoute());
+			trip = strVal(patch.getTrip());
+			stop = strVal(patch.getStop());
+    	}
+    	
+    	private String strVal(AgencyAndId aid) {
+    		if(aid == null) {
+    			return null;
+    		}
+    		return aid.getAgencyId()+":"+aid.getId();
     	}
     	
     	static AlertDTO from(AlertPatch alert) {
-    		return new AlertDTO(alert.getAlert());
+    		return new AlertDTO(alert);
     	}
     	
     	public String getHeader() {
@@ -70,6 +82,18 @@ public class AlertsResource {
     	
     	public Date getEnd() {
 			return end;
+		}
+    	
+    	public String getRoute() {
+			return route;
+		}
+    	
+    	public String getTrip() {
+			return trip;
+		}
+    	
+    	public String getStop() {
+			return stop;
 		}
     	
     	@Override
