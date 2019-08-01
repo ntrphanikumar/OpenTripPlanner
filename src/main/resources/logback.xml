@@ -10,6 +10,20 @@
   <!-- This will push these level changes onto JUL. Otherwise, JUL defaults to a high threshold
        for logging and debug log messages will never make it to slf4j. -->
   <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+  
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>/var/log/otp/otp.log </file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>/var/log/otp/otp.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <maxFileSize>100MB</maxFileSize>
+        </timeBasedFileNamingAndTriggeringPolicy>
+        <maxHistory>100</maxHistory>
+    </rollingPolicy>
+    <encoder>
+        <pattern>%d{HH:mm:ss.SSS} %level \(%F:%L\) %msg%n</pattern>
+    </encoder>
+  </appender>
 
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
@@ -20,7 +34,7 @@
 
   <!-- Change this to debug to let more messages through. -->
   <root level="info">
-    <appender-ref ref="stdout" />
+    <appender-ref ref="FILE" />
   </root>
   <logger name="ch.qos.logback" level="warn"/>
   <logger name="com.amazonaws" level="info"/>
