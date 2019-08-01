@@ -59,4 +59,6 @@
   <!-- Suppress an inconsequential IOException that is logged at debug level. -->
   <logger name="org.glassfish.grizzly" level="info" />
 
+  <logger name="org.opentripplanner.updater.stoptime.TimetableSnapshotSource" level="error"/>
+  
 </configuration>
