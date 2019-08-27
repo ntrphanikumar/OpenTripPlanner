@@ -45,7 +45,7 @@ public class AlertsResource {
         		break;
         	}
         }
-		return alertPatches.stream().map(t -> AlertDTO.from(t, graph.index)).collect(Collectors.groupingBy(AlertDTO::getHeader)).values().stream()
+		return alertPatches.stream().filter(t -> t.getRoute()!=null).map(t -> AlertDTO.from(t, graph.index)).collect(Collectors.groupingBy(AlertDTO::getHeader)).values().stream()
 				.map(a -> a.stream().reduce((t, u) -> t.merge(u)).get()).collect(Collectors.toList());
     }
     
