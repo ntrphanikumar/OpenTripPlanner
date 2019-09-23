@@ -81,6 +81,7 @@ public class OTPApplication extends Application {
             TimeGridWs.class,
             AlertPatcher.class,
             AlertsResource.class,
+            VehiclePositionsResource.class,
             PlannerResource.class,
             SIsochrone.class,
             Routers.class,
