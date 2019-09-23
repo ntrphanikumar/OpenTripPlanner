@@ -18,7 +18,7 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.vehiclepositions.GtfsRealtimeVehiclePostionsUpdater;
 import org.opentripplanner.updater.vehiclepositions.VehiclePositionsUpdateHandler.VehiclePositionDTO;
 
-@Path("/routers/{routerId}/vehiclepostitions")
+@Path("/routers/{routerId}/vehiclepositions")
 @XmlRootElement
 public class VehiclePositionsResource {
 
@@ -26,7 +26,7 @@ public class VehiclePositionsResource {
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON})
-    public Collection<VehiclePositionDTO> getAllAlerts(@PathParam("routerId") String routerId) {
+    public Collection<VehiclePositionDTO> getVehiclePositions(@PathParam("routerId") String routerId) {
     	final Graph graph = otpServer.getRouter(routerId).graph;
 		GraphUpdaterManager updaterManager = graph.updaterManager;
         for(int i=0;i<updaterManager.size();i++) {
