@@ -70,6 +70,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,13 +157,19 @@ public class IndexAPI {
                 agencyRoutes.add(route);
             }
         }
-        routes = agencyRoutes;
+        routes = sort(agencyRoutes);
         if (detail){
             return Response.status(Status.OK).entity(routes).build();
         }
         else {
             return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
         }
+    }
+    
+    private Collection<Route> sort(Collection<Route> routes) {
+        List<Route> sorted = new ArrayList<>(routes);
+        Collections.sort(sorted, (r1, r2) -> r1.getSortOrder() - r2.getSortOrder());
+        return sorted;
     }
    
    /** Return specific transit stop in the graph, by ID. */
@@ -240,7 +247,7 @@ public class IndexAPI {
        for (TripPattern pattern : index.patternsForStop.get(stop)) {
            routes.add(pattern.route);
        }
-       return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
+       return Response.status(Status.OK).entity(RouteShort.list(sort(routes))).build();
    }
 
    @GET
@@ -347,7 +354,7 @@ public class IndexAPI {
                routes.retainAll(routesHere);
            }
        }
-       return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
+       return Response.status(Status.OK).entity(RouteShort.list(sort(routes))).build();
    }
 
    /** Return specific route in the graph, for the given ID. */
