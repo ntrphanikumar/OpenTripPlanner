@@ -119,4 +119,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     public String toString() {
         return "GtfsRealtimeUpdater(" + url + ")";
     }
+    
+    public AlertPatchService getAlertPatchService() {
+		return alertPatchService;
+	}
 }

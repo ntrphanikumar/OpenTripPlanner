@@ -80,6 +80,8 @@ public class OTPApplication extends Application {
             ExternalGeocoderResource.class,
             TimeGridWs.class,
             AlertPatcher.class,
+            AlertsResource.class,
+            VehiclePositionsResource.class,
             PlannerResource.class,
             SIsochrone.class,
             Routers.class,
