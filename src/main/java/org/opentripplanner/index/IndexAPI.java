@@ -71,6 +71,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,17 @@ public class IndexAPI {
     private final GraphIndex index;
     private final StreetVertexIndexService streetIndex;
     private final ObjectMapper deserializer = new ObjectMapper();
+    
+    private final Comparator<Route> routeComparator = (r1, r2) -> {
+        if(r1.isSortOrderSet() && r2.isSortOrderSet()) {
+            return r1.getSortOrder() - r2.getSortOrder();
+        } else if(r1.isSortOrderSet()) {
+            return -1;
+        } else if(r2.isSortOrderSet()) {
+            return 1;
+        }
+        return 0;
+    };
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         Router router = otpServer.getRouter(routerId);
@@ -168,7 +180,7 @@ public class IndexAPI {
     
     private Collection<Route> sort(Collection<Route> routes) {
         List<Route> sorted = new ArrayList<>(routes);
-        Collections.sort(sorted, (r1, r2) -> r1.getSortOrder() - r2.getSortOrder());
+        Collections.sort(sorted, routeComparator);
         return sorted;
     }
    
