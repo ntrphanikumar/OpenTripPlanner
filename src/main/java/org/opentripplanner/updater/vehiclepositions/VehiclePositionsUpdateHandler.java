@@ -3,8 +3,6 @@ package org.opentripplanner.updater.vehiclepositions;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
@@ -39,7 +37,7 @@ public class VehiclePositionsUpdateHandler {
 	}
 
 	public static final class VehiclePositionDTO {
-		private AgencyAndId route, trip, stop, direction;
+		private String route, trip, stop, direction;
 		private Float latitude, longitude;
 		private String vehicleId, vehicleLabel;
 		private OccupancyStatus occupancyStatus;
@@ -48,17 +46,17 @@ public class VehiclePositionsUpdateHandler {
 		public VehiclePositionDTO(String feedId, VehiclePosition pos) {
 			if(pos.hasTrip()) {
 				if(pos.getTrip().hasRouteId()) {
-					route = new AgencyAndId(feedId, pos.getTrip().getRouteId());
+					route = feedId+":"+pos.getTrip().getRouteId();
 				}
 				if(pos.getTrip().hasTripId()) {
-					trip = new AgencyAndId(feedId, pos.getTrip().getTripId());
+					trip = feedId+":"+pos.getTrip().getTripId();
 				}
 				if(pos.getTrip().hasDirectionId()) {
-					direction = new AgencyAndId(feedId, pos.getTrip().getDirectionId()+"");
+					direction = feedId+":"+pos.getTrip().getDirectionId();
 				}
 			}
 			if(pos.hasStopId()) {
-				stop = new AgencyAndId(feedId, pos.getStopId());
+				stop = feedId+":"+pos.getStopId();
 			}
 			if(pos.hasOccupancyStatus()) {
 				occupancyStatus = pos.getOccupancyStatus();
@@ -76,19 +74,19 @@ public class VehiclePositionsUpdateHandler {
 			}
 		}
 
-		public AgencyAndId getRoute() {
+		public String getRoute() {
 			return route;
 		}
 		
-		public AgencyAndId getTrip() {
+		public String getTrip() {
 			return trip;
 		}
 		
-		public AgencyAndId getStop() {
+		public String getStop() {
 			return stop;
 		}
 		
-		public AgencyAndId getDirection() {
+		public String getDirection() {
 			return direction;
 		}
 

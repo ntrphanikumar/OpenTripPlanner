@@ -13,7 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.apache.commons.lang3.StringUtils;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.updater.GraphUpdater;
@@ -35,11 +35,9 @@ public class VehiclePositionsResource {
         for(int i=0;i<updaterManager.size();i++) {
         	GraphUpdater updater = updaterManager.getUpdater(i);
         	if(updater instanceof GtfsRealtimeVehiclePostionsUpdater) {
-				AgencyAndId route = routeId != null ? AgencyAndId.convertFromString(routeId, ':') : null;
-				AgencyAndId trip = tripId != null ? AgencyAndId.convertFromString(tripId, ':') : null;
         		return ((GtfsRealtimeVehiclePostionsUpdater) updater).getVehiclePositions().stream()
-        				.filter(vp -> route == null || route.equals(vp.getRoute()))
-        				.filter(vp -> trip == null || trip.equals(vp.getTrip()))
+        				.filter(vp -> StringUtils.equals(routeId, vp.getRoute()))
+        				.filter(vp -> StringUtils.equals(tripId, vp.getTrip()))
         				.collect(Collectors.toList());
         	}
         }
