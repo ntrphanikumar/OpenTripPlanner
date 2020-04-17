@@ -36,8 +36,8 @@ public class VehiclePositionsResource {
         	GraphUpdater updater = updaterManager.getUpdater(i);
         	if(updater instanceof GtfsRealtimeVehiclePostionsUpdater) {
         		return ((GtfsRealtimeVehiclePostionsUpdater) updater).getVehiclePositions().stream()
-        				.filter(vp -> StringUtils.equals(routeId, vp.getRoute()))
-        				.filter(vp -> StringUtils.equals(tripId, vp.getTrip()))
+        				.filter(vp -> StringUtils.isBlank(routeId) || StringUtils.equals(routeId, vp.getRoute()))
+        				.filter(vp -> StringUtils.isBlank(tripId) ||StringUtils.equals(tripId, vp.getTrip()))
         				.collect(Collectors.toList());
         	}
         }
