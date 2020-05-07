@@ -398,15 +398,9 @@ public class IndexAPI {
    public Response getStopsForRoute (@PathParam("routeId") String routeIdString) {
        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
-       index.servicesRunning(new ServiceDate(new Date()));
        if (route != null) {
             Collection<TripPattern> patterns = index.patternsForRoute.get(route);
-            Set<Stop> stops = new TreeSet<>((s1, s2) -> patterns.stream().map(t -> {
-                if (t.getStops().contains(s1) && t.getStops().contains(s2)) {
-                    return t.getStops().indexOf(s1) - t.getStops().indexOf(s2);
-                }
-                return null;
-            }).filter(r -> r != null).findFirst().orElse(0));
+            Set<Stop> stops = Sets.newHashSet();
             for (TripPattern pattern : patterns) {
                 stops.addAll(pattern.getStops());
             }
