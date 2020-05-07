@@ -3,14 +3,17 @@ package org.opentripplanner.index;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -41,6 +44,7 @@ import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -394,6 +398,7 @@ public class IndexAPI {
    public Response getStopsForRoute (@PathParam("routeId") String routeIdString) {
        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
+       index.servicesRunning(new ServiceDate(new Date()));
        if (route != null) {
             Collection<TripPattern> patterns = index.patternsForRoute.get(route);
             Set<Stop> stops = new TreeSet<>((s1, s2) -> patterns.stream().map(t -> {
@@ -410,6 +415,51 @@ public class IndexAPI {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
+   
+    @GET
+    @Path("/routes/{routeId}/uniquetrips")
+    public Response getUniqueTripsForRoute(@PathParam("routeId") String routeIdString) {
+        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
+        Route route = index.routeForId.get(routeId);
+        if (route != null) {
+            CalendarService calendarService = index.getCalendarService();
+            return Response.status(Status.OK).entity(TripShort.list(getFirstMatchingTrips(route, calendarService.getServiceIds()))).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+    
+    @GET
+    @Path("/routes/{routeId}/uniquetripstoday")
+    public Response getUniqueTripsRunningTodayForRoute(@PathParam("routeId") String routeIdString) {
+        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
+        Route route = index.routeForId.get(routeId);
+        if (route != null) {
+            CalendarService calendarService = index.getCalendarService();
+            ServiceDate today = new ServiceDate(Calendar.getInstance(calendarService.getTimeZoneForAgencyId(route.getAgency().getId())));
+            Set<FeedScopedId> todayServices = calendarService.getServiceIdsOnDate(today);
+            return Response.status(Status.OK).entity(TripShort.list(getFirstMatchingTrips(route, todayServices))).build();
+        } else {
+            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        }
+    }
+    
+    private static final Comparator<Trip> TRIP_COMPARATOR = (t1, t2) -> {
+        return tripToString(t2).compareTo(tripToString(t1));
+    };
+    
+    private static final String tripToString(Trip trip) {
+        return trip.getServiceId() + "-" + trip.getTripHeadsign() + "-" + trip.getDirectionId();
+    }
+
+    private Collection<Trip> getFirstMatchingTrips(Route route, Set<FeedScopedId> todayServices) {
+        List<Trip> tripList = index.patternsForRoute.get(route).stream().map(TripPattern::getTrips).flatMap(Collection::stream)
+                .distinct().filter(trip -> todayServices.contains(trip.getServiceId()))
+                .collect(Collectors.groupingBy(IndexAPI::tripToString))
+                .values().stream().map(list -> list.stream().findFirst().orElse(null)).filter(trip -> trip!=null).collect(Collectors.toList());
+        tripList.sort(TRIP_COMPARATOR);
+        return tripList;
+    }
 
    /** Return all trips in any pattern on the given route. */
    @GET

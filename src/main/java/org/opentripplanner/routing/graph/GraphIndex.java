@@ -702,4 +702,8 @@ public class GraphIndex {
         }
         return allAgencies;
     }
+    
+    public CalendarService getCalendarService() {
+        return calendarService;
+    }
 }
