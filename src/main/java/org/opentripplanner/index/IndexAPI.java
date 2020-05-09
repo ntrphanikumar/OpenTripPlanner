@@ -7,12 +7,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
@@ -447,10 +445,13 @@ public class IndexAPI {
     }
 
     private Collection<Trip> getFirstMatchingTrips(Route route, Set<FeedScopedId> todayServices) {
-        List<Trip> tripList = index.patternsForRoute.get(route).stream().map(TripPattern::getTrips).flatMap(Collection::stream)
-                .distinct().filter(trip -> todayServices.contains(trip.getServiceId()))
-                .collect(Collectors.groupingBy(IndexAPI::tripToString))
-                .values().stream().map(list -> list.stream().findFirst().orElse(null)).filter(trip -> trip!=null).collect(Collectors.toList());
+        List<Trip> tripList = index.patternsForRoute.get(route).stream().map(TripPattern::getTrips)
+                .flatMap(Collection::stream).distinct().filter(trip -> todayServices.contains(trip.getServiceId()))
+                .collect(Collectors.groupingBy(IndexAPI::tripToString)).values().stream()
+                .map(list -> list.stream().findFirst().orElse(null)).filter(trip -> trip != null)
+                .collect(Collectors.groupingBy(trip -> index.patternForTrip.get(trip).getStops().stream()
+                        .map(Stop::getCode).collect(Collectors.joining("-"))))
+                .values().stream().map(trips -> trips.stream().findFirst().orElse(null)).collect(Collectors.toList());
         tripList.sort(TRIP_COMPARATOR);
         return tripList;
     }
