@@ -1,7 +1,7 @@
 package org.opentripplanner.api.resource;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
@@ -36,13 +36,12 @@ public class AlertsResource {
     public Collection<AlertDTO> getAllAlerts(@PathParam("routerId") String routerId) {
     	final Graph graph = otpServer.getRouter(routerId).graph;
 		GraphUpdaterManager updaterManager = graph.updaterManager;
-    	Collection<AlertPatch> alertPatches = Collections.emptyList();
+    	Collection<AlertPatch> alertPatches = new ArrayList<>();
         for(int i=0;i<updaterManager.size();i++) {
         	GraphUpdater updater = updaterManager.getUpdater(i);
         	if(updater instanceof GtfsRealtimeAlertsUpdater) {
         		GtfsRealtimeAlertsUpdater alertsUpdater = (GtfsRealtimeAlertsUpdater)updater;
-        		alertPatches = alertsUpdater.getAlertPatchService().getAllAlertPatches();
-        		break;
+        		alertPatches.addAll(alertsUpdater.getAlertPatchService().getAllAlertPatches());
         	}
         }
 		return alertPatches.stream().filter(t -> t.getRoute()!=null)
