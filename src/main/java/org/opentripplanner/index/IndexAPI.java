@@ -101,7 +101,7 @@ public class IndexAPI {
         } else if(r2.isSortOrderSet()) {
             return 1;
         }
-        return r1.getShortName().compareTo(r2.getShortName());
+        return 0;
     };
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
