@@ -28,16 +28,14 @@ public class VehiclePositionsResource {
     
     @GET
     @Produces({ MediaType.APPLICATION_JSON})
-    public Collection<VehiclePositionDTO> getVehiclePositions(@PathParam("routerId") String routerId, @QueryParam("route") String routeId, @QueryParam("trip") String tripId) {
+    public Collection<VehiclePositionDTO> getVehiclePositions(@PathParam("routerId") String routerId, @QueryParam("trip") String tripId) {
         final Graph graph = otpServer.getRouter(routerId).graph;
         GraphUpdaterManager updaterManager = graph.updaterManager;
-        boolean allRoutes = StringUtils.isBlank(routeId);
         boolean allTrips = StringUtils.isBlank(tripId);
         return IntStream.range(0, updaterManager.size()).boxed().map(updaterManager::getUpdater)
                 .filter(updater -> (updater instanceof GtfsRealtimeVehiclePostionsUpdater))
                 .map(u -> (GtfsRealtimeVehiclePostionsUpdater) u)
                 .map(u -> u.getVehiclePositions().stream()
-                        .filter(vp -> allRoutes || StringUtils.equals(routeId, vp.getRoute()))
                         .filter(vp -> allTrips || StringUtils.equals(tripId, vp.getTrip())))
                 .flatMap(listStream -> listStream).collect(Collectors.toList());
     }
