@@ -10,11 +10,14 @@ import com.beust.jcommander.internal.Lists;
 public class PatternShort {
 
     public String id;
+    public String name;
     public String desc;
     
     public PatternShort (TripPattern pattern) {
         id = pattern.code;
-        desc = pattern.name;
+        desc = pattern.name.replaceAll("\\(" + pattern.getFeedId() + ":.*?\\)","").replaceAll("( )+", " ").trim();
+        name = "To " + desc.split(" to ",2)[1].trim();
+        
     }
     
     public static List<PatternShort> list (Collection<TripPattern> in) {
@@ -22,5 +25,4 @@ public class PatternShort {
         for (TripPattern pattern : in) out.add(new PatternShort(pattern));
         return out;
     }    
-    
 }
