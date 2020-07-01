@@ -52,9 +52,8 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
 
-  /* Private Methods */
-
-    protected CalendarServiceData getData() {
+    @Override
+    public CalendarServiceData getData() {
         return data;
     }
 }

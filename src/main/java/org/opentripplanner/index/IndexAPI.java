@@ -383,8 +383,7 @@ public class IndexAPI {
        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
-           Collection<TripPattern> patterns = index.patternsForRoute.get(route);
-           return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
+           return Response.status(Status.OK).entity(PatternShort.list(index.patternsForRoute.get(route), index.getServiceCodes(), index.getCalendarService().getData())).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }

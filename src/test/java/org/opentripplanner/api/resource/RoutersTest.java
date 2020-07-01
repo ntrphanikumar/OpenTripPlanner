@@ -68,7 +68,7 @@ public class RoutersTest {
             }
         };
 
-        calendarService.putServiceDatesForServiceId(new FeedScopedId("NA", "1"), serviceDates);
+        calendarService.putServiceDatesForServiceId(new FeedScopedId("NA", "1"), serviceDates, null);
 
         final Graph graph = new Graph();
         graph.updateTransitFeedValidity(calendarService);

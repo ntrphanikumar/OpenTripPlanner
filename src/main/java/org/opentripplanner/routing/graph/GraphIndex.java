@@ -706,4 +706,8 @@ public class GraphIndex {
     public CalendarService getCalendarService() {
         return calendarService;
     }
+    
+    public Map<FeedScopedId, Integer> getServiceCodes() {
+        return serviceCodes;
+    }
 }

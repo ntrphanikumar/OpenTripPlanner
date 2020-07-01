@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 import java.util.Set;
@@ -37,4 +38,6 @@ public interface CalendarService {
      * not found
      */
     TimeZone getTimeZoneForAgencyId(String agencyId);
+
+    CalendarServiceData getData();
 }
