@@ -32,15 +32,28 @@ public class PatternShort {
         id = pattern.code;
         desc = pattern.name.replaceAll("\\(" + pattern.getFeedId() + ":.*?\\)","").replaceAll("( )+", " ").trim();
         String[] split = desc.split(" to ", 2);
-        String route = split[0];
-        split = split[1].split(" from ", 2);
-        desc = route + " from "+ split[1]+" to "+ split[0];
+        String route, from=null, to=null;
+        if(split.length == 2) {
+            route = split[0];
+            split = split[1].split(" from ", 2);
+            to = split[0];
+            if(split.length == 2) {
+                from = split[1];
+            }
+        } else {
+            split = split[0].split(" from ", 2);
+            route = split[0];
+            if(split.length == 2) {
+                from = split[1];
+            }
+        }
+        desc = route + (from != null ? (" from " + from) : "") + (to != null ? (" to " + to) : "");
         name = desc;
     }
     
     public PatternShort (TripPattern pattern, String serviceDays) {
         this(pattern);
-        name += " "+ serviceDays;
+        name += serviceDays;
         desc = name;
     }
     
@@ -80,18 +93,21 @@ public class PatternShort {
     }
     
     private static String servicedays(ServiceCalendar calendar) {
+        if(calendar == null) {
+            return "";
+        }
         Integer runningDaysInWeek = allOf(Days.class).stream().map(day -> day.isRunningOnDayFunc.apply(calendar)).collect(reducing(0, (t,u) -> t+u));
         Map<Days, Boolean> runningDaysMap = allOf(Days.class).stream().collect(toMap(day -> day, day -> day.isRunning(calendar)));
         String daysStr = allOf(Days.class).stream().filter(runningDaysMap::get).map(Days::toString).collect(joining(", "));
         // Daily
         if(runningDaysInWeek == 7) {
-            return daysStr;
+            return " "+daysStr;
         }
         //On weekends or weekdays
         if((runningDaysInWeek == 2 && of(Sat, Sun).stream().map(runningDaysMap::get).reduce(true, (a,b)->a&&b)) 
                 || (runningDaysInWeek == 5 && complementOf(of(Sat, Sun)).stream().map(runningDaysMap::get).reduce(true, (a,b)->a&&b))) {
-            return "on " + daysStr;
+            return " on " + daysStr;
         }
-        return "every " + daysStr;
+        return " every " + daysStr;
     }
 }
