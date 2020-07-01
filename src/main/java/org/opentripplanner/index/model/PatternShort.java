@@ -89,7 +89,7 @@ public class PatternShort {
     }
     
     private static String servicedays(ServiceCalendar calendar) {
-        Integer runningDaysInWeek = allOf(Days.class).stream().map(day -> day.isRunningOnDayFunc.apply(calendar)).collect(reducing(0, (t,u) -> t+u));
+        Integer runningDaysInWeek = allOf(Days.class).stream().map(day -> day.isRunning(calendar) ? 1 : 0).collect(reducing(0, (t,u) -> t+u));
         Map<Days, Boolean> runningDaysMap = allOf(Days.class).stream().collect(toMap(day -> day, day -> day.isRunning(calendar)));
         String daysStr = allOf(Days.class).stream().filter(runningDaysMap::get).map(Days::toString).collect(joining(", "));
         // Daily
