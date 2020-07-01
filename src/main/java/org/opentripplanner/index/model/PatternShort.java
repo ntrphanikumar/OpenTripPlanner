@@ -83,19 +83,12 @@ public class PatternShort {
             this.isRunningOnDayFunc = isRunningOnDayFunc;
         }
         
-        public Function<ServiceCalendar, Integer> getIsRunningOnDayFunc() {
-            return isRunningOnDayFunc;
-        }
-        
         public Boolean isRunning(ServiceCalendar calendar) {
-            return isRunningOnDayFunc.apply(calendar) == 1;
+            return calendar != null && isRunningOnDayFunc.apply(calendar) == 1;
         }
     }
     
     private static String servicedays(ServiceCalendar calendar) {
-        if(calendar == null) {
-            return "";
-        }
         Integer runningDaysInWeek = allOf(Days.class).stream().map(day -> day.isRunningOnDayFunc.apply(calendar)).collect(reducing(0, (t,u) -> t+u));
         Map<Days, Boolean> runningDaysMap = allOf(Days.class).stream().collect(toMap(day -> day, day -> day.isRunning(calendar)));
         String daysStr = allOf(Days.class).stream().filter(runningDaysMap::get).map(Days::toString).collect(joining(", "));
@@ -108,6 +101,6 @@ public class PatternShort {
                 || (runningDaysInWeek == 5 && complementOf(of(Sat, Sun)).stream().map(runningDaysMap::get).reduce(true, (a,b)->a&&b))) {
             return " on " + daysStr;
         }
-        return " every " + daysStr;
+        return runningDaysInWeek > 0 ? (" every " + daysStr) : "";
     }
 }
