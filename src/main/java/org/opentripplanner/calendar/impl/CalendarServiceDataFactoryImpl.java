@@ -86,7 +86,7 @@ public class CalendarServiceDataFactoryImpl {
             List<ServiceDate> serviceDates = new ArrayList<>(activeDates);
             Collections.sort(serviceDates);
 
-            data.putServiceDatesForServiceId(serviceId, serviceDates);
+            data.putServiceDatesForServiceId(serviceId, serviceDates, transitService.getCalendarForServiceId(serviceId));
 
             addDatesForLocalizedServiceId(serviceId, serviceDates, data);
         }
