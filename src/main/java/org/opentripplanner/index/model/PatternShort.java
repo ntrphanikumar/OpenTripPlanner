@@ -1,14 +1,9 @@
 package org.opentripplanner.index.model;
 
 import static java.util.EnumSet.allOf;
-import static java.util.EnumSet.complementOf;
-import static java.util.EnumSet.of;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
-import static org.opentripplanner.index.model.PatternShort.Days.Sat;
-import static org.opentripplanner.index.model.PatternShort.Days.Sun;
 
 import java.util.Collection;
 import java.util.List;
@@ -47,14 +42,23 @@ public class PatternShort {
                 from = split[1];
             }
         }
-        desc = route + (from != null ? (" from " + from) : "") + (to != null ? (" to " + to) : "");
+        StringBuilder descStr = new StringBuilder("Route: ").append(route);
+        if (from != null) {
+            descStr.append("\n").append("From: ").append(from);
+        }
+        if (to != null) {
+            descStr.append("\n").append("To: ").append(to);
+        }
+        desc = descStr.toString();
         name = desc;
     }
     
     public PatternShort (TripPattern pattern, String serviceDays) {
         this(pattern);
-        name += serviceDays;
-        desc = name;
+        if(serviceDays != null && serviceDays.trim().length()>0) {
+            name += "\nDays of operation: " + serviceDays;
+            desc = name;
+        }
     }
     
     public static List<PatternShort> list (Collection<TripPattern> in) {
@@ -89,18 +93,19 @@ public class PatternShort {
     }
     
     private static String servicedays(ServiceCalendar calendar) {
-        Integer runningDaysInWeek = allOf(Days.class).stream().map(day -> day.isRunning(calendar) ? 1 : 0).collect(reducing(0, (t,u) -> t+u));
-        Map<Days, Boolean> runningDaysMap = allOf(Days.class).stream().collect(toMap(day -> day, day -> day.isRunning(calendar)));
-        String daysStr = allOf(Days.class).stream().filter(runningDaysMap::get).map(Days::toString).collect(joining(", "));
-        // Daily
-        if(runningDaysInWeek == 7) {
-            return " "+daysStr;
-        }
-        //On weekends or weekdays
-        if((runningDaysInWeek == 2 && of(Sat, Sun).stream().map(runningDaysMap::get).reduce(true, (a,b)->a&&b)) 
-                || (runningDaysInWeek == 5 && complementOf(of(Sat, Sun)).stream().map(runningDaysMap::get).reduce(true, (a,b)->a&&b))) {
-            return " on " + daysStr;
-        }
-        return runningDaysInWeek > 0 ? (" every " + daysStr) : "";
+        return allOf(Days.class).stream().filter(day -> day.isRunning(calendar)).map(Days::toString).collect(joining(", "));
+//        Integer runningDaysInWeek = allOf(Days.class).stream().map(day -> day.isRunning(calendar) ? 1 : 0).collect(reducing(0, (t,u) -> t+u));
+//        Map<Days, Boolean> runningDaysMap = allOf(Days.class).stream().collect(toMap(day -> day, day -> day.isRunning(calendar)));
+//        String daysStr = allOf(Days.class).stream().filter(runningDaysMap::get).map(Days::toString).collect(joining(", "));
+//        // Daily
+//        if(runningDaysInWeek == 7) {
+//            return " "+daysStr;
+//        }
+//        //On weekends or weekdays
+//        if((runningDaysInWeek == 2 && of(Sat, Sun).stream().map(runningDaysMap::get).reduce(true, (a,b)->a&&b)) 
+//                || (runningDaysInWeek == 5 && complementOf(of(Sat, Sun)).stream().map(runningDaysMap::get).reduce(true, (a,b)->a&&b))) {
+//            return " on " + daysStr;
+//        }
+//        return runningDaysInWeek > 0 ? (" every " + daysStr) : "";
     }
 }
