@@ -5,6 +5,7 @@ import com.google.common.collect.ArrayListMultimap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -533,6 +534,7 @@ public class GraphIndex {
                 }
                 sidx++;
             }
+            Collections.sort(stopTimes.times, (o1, o2) -> Integer.compare(o1.realtimeArrival, o2.realtimeArrival));
             ret.add(stopTimes);
         }
         return ret;
