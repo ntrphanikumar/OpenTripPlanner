@@ -78,7 +78,7 @@ public abstract class RoutingResource {
     protected Boolean wheelchair;
 
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
-    @QueryParam("maxWalkDistance")
+//    @QueryParam("maxWalkDistance")
     protected Double maxWalkDistance;
 
     /**
