@@ -1,6 +1,11 @@
 package org.opentripplanner.routing.impl;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -15,21 +20,23 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.SampleEdge;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.SampleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.I18NString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods

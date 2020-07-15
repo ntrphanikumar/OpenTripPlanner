@@ -79,4 +79,8 @@ public class TripTimeShort {
         return out;
     }
     
+    public int arrival() {
+        return realtime ? realtimeArrival: scheduledArrival;
+    }
+    
 }

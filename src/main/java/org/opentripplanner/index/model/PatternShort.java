@@ -23,6 +23,12 @@ public class PatternShort {
     public String name;
     public String desc;
     
+    public PatternShort (TripPattern pattern, boolean legacyDisplay) {
+        this(pattern);
+        desc = desc.replaceAll("<b>", "").replaceAll("</b>", "").replaceAll("<br/>", "\n");
+        name = desc;
+    }
+    
     public PatternShort (TripPattern pattern) {
         id = pattern.code;
         desc = pattern.name.replaceAll("\\(" + pattern.getFeedId() + ":.*?\\)","").replaceAll("( )+", " ").trim();
@@ -42,12 +48,12 @@ public class PatternShort {
                 from = split[1];
             }
         }
-        StringBuilder descStr = new StringBuilder("Route: ").append(route);
+        StringBuilder descStr = new StringBuilder("<b>Route:</b> ").append(route);
         if (from != null) {
-            descStr.append("\n").append("From: ").append(from);
+            descStr.append("<br/>").append("<b>From:</b> ").append(from);
         }
         if (to != null) {
-            descStr.append("\n").append("To: ").append(to);
+            descStr.append("<br/>").append("<b>To:</b> ").append(to);
         }
         desc = descStr.toString();
         name = desc;
@@ -56,7 +62,7 @@ public class PatternShort {
     public PatternShort (TripPattern pattern, String serviceDays) {
         this(pattern);
         if(serviceDays != null && serviceDays.trim().length()>0) {
-            name += "\nDays of operation: " + serviceDays;
+            name += "<br/><b>Days of operation:</b> " + serviceDays;
             desc = name;
         }
     }
