@@ -226,6 +226,7 @@ public class IndexAPI {
                    stops.add(new StopShort(stopVertex.getStop(), (int) distance));
                }
            }
+           Collections.sort(stops, (o1, o2) -> Integer.compare(o1.dist, o2.dist));
            return Response.status(Status.OK).entity(stops).build();
        } else {
            /* We're not circle mode, we must be in box mode. */
@@ -282,7 +283,7 @@ public class IndexAPI {
                                          @QueryParam("omitNonPickups") boolean omitNonPickups) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups )).build();
+        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups)).build();
     }
 
     /**
@@ -305,6 +306,13 @@ public class IndexAPI {
         }
 
         List<StopTimesInPattern> ret = index.getStopTimesForStop(stop, sd, omitNonPickups);
+        ret = ret.stream().map(pattern -> {
+            pattern.times = pattern.times.stream().filter(t -> !(t.realtime && t.realtimeArrival == TripTimeShort.UNDEFINED))
+                    .filter(t -> (System.currentTimeMillis() / 1000) < (t.serviceDay + t.arrival()))
+                    .sorted((t1, t2) -> Integer.compare(t1.arrival(), t2.arrival()))
+                    .collect(Collectors.toList());
+            return pattern;
+        }).filter(pattern -> !pattern.times.isEmpty()).collect(Collectors.toList());
         return Response.status(Status.OK).entity(ret).build();
     }
     
