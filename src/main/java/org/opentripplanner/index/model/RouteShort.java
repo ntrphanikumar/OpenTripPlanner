@@ -15,7 +15,7 @@ public class RouteShort {
     public String shortName;
     public String longName;
     public String mode;
-    public String color;
+    public String color, textColor;
     public String agencyName;
 
     public RouteShort (Route route) {
@@ -24,6 +24,7 @@ public class RouteShort {
         longName = route.getLongName();
         mode = GtfsLibrary.getTraverseMode(route).toString();
         color = route.getColor();
+        textColor = route.getTextColor();
         agencyName = route.getAgency().getName();
     }
 

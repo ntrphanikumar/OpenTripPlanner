@@ -25,6 +25,7 @@ public class PatternShort {
     public String id;
     public String name;
     public String desc;
+    public String color, textColor;
     
     public PatternShort (TripPattern pattern, boolean legacyDisplay) {
         this(pattern);
@@ -60,6 +61,10 @@ public class PatternShort {
         }
         desc = descStr.toString();
         name = desc;
+        if(!pattern.getTrips().isEmpty()) {
+            color = pattern.getTrip(0).getRoute().getColor();
+            textColor = pattern.getTrip(0).getRoute().getTextColor();
+        }
     }
     
     public PatternShort (TripPattern pattern, String serviceDays) {
