@@ -2,13 +2,14 @@ package org.opentripplanner.index.model;
 
 import static java.util.EnumSet.allOf;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -77,7 +78,11 @@ public class PatternShort {
     
     public static Collection<PatternShort> list (Collection<TripPattern> patterns, Map<FeedScopedId, Integer> services, CalendarServiceData csd) {
         Map<Integer, String> serviceCalendars = services.entrySet().stream().collect(toMap(e -> e.getValue(), e -> servicedays(csd.getServiceCalendar(e.getKey()))));
-        return patterns.stream().map(pattern -> pattern.getServices().stream().mapToObj(i->new PatternShort(pattern,serviceCalendars.get(i)))).flatMap(s->s).collect(toSet());
+        Map<Integer, Days> serviceStartDay = services.entrySet().stream().collect(toMap(e -> e.getValue(), e -> servicedaysStream(csd.getServiceCalendar(e.getKey())).findFirst().orElse(null)));
+        return patterns.stream()
+                .map(pattern -> pattern.getServices().stream().mapToObj(i -> i).sorted((s1, s2) -> serviceStartDay.get(s1).ordinal() - serviceStartDay.get(s2).ordinal())
+                        .map(i -> new PatternShort(pattern, serviceCalendars.get(i))))
+                .flatMap(s -> s).collect(toList());
     }
     
     public enum Days {
@@ -100,8 +105,12 @@ public class PatternShort {
         }
     }
     
+    private static Stream<Days> servicedaysStream(ServiceCalendar calendar) {
+        return allOf(Days.class).stream().filter(day -> day.isRunning(calendar));
+    }
+    
     private static String servicedays(ServiceCalendar calendar) {
-        return allOf(Days.class).stream().filter(day -> day.isRunning(calendar)).map(Days::toString).collect(joining(", "));
+        return servicedaysStream(calendar).map(Days::toString).collect(joining(", "));
     }
     
     @Override
