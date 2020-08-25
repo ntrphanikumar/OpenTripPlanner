@@ -83,7 +83,7 @@ public class PatternShort {
     
     public static Collection<PatternShort> list (Collection<TripPattern> patterns, Map<FeedScopedId, Integer> services, CalendarServiceData csd) {
         Map<Integer, String> serviceCalendars = services.entrySet().stream().collect(toMap(e -> e.getValue(), e -> servicedays(csd.getServiceCalendar(e.getKey()))));
-        Map<Integer, Days> serviceStartDay = services.entrySet().stream().collect(toMap(e -> e.getValue(), e -> servicedaysStream(csd.getServiceCalendar(e.getKey())).findFirst().orElse(null)));
+        Map<Integer, Days> serviceStartDay = services.entrySet().stream().collect(toMap(e -> e.getValue(), e -> servicedaysStream(csd.getServiceCalendar(e.getKey())).findFirst().orElse(Days.NONE)));
         return patterns.stream()
                 .map(pattern -> pattern.getServices().stream().mapToObj(i -> i).sorted((s1, s2) -> serviceStartDay.get(s1).ordinal() - serviceStartDay.get(s2).ordinal())
                         .map(i -> new PatternShort(pattern, serviceCalendars.get(i))))
@@ -97,7 +97,8 @@ public class PatternShort {
         Thu(ServiceCalendar::getThursday),
         Fri(ServiceCalendar::getFriday),
         Sat(ServiceCalendar::getSaturday),
-        Sun(ServiceCalendar::getSunday);
+        Sun(ServiceCalendar::getSunday),
+        NONE(s -> 1);
         
         private Function<ServiceCalendar, Integer> isRunningOnDayFunc;
         
