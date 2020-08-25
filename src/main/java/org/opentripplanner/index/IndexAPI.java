@@ -312,7 +312,7 @@ public class IndexAPI {
                     .sorted((t1, t2) -> Integer.compare(t1.arrival(), t2.arrival()))
                     .collect(Collectors.toList());
             return pattern;
-        }).filter(pattern -> !pattern.times.isEmpty()).collect(Collectors.toList());
+        }).filter(pattern -> !pattern.times.isEmpty()).sorted((stp1, stp2) -> stp1.times.get(0).arrival()-stp2.times.get(0).arrival()).collect(Collectors.toList());
         return Response.status(Status.OK).entity(ret).build();
     }
     
