@@ -88,7 +88,7 @@ public class PatternShort {
         return patterns.stream()
                 .map(pattern -> pattern.getServices().stream().mapToObj(i -> i).sorted((s1, s2) -> serviceStartDay.get(s1).ordinal() - serviceStartDay.get(s2).ordinal())
                         .map(i -> new PatternShort(pattern, serviceCalendars.get(i))))
-                .flatMap(s -> s).collect(toList());
+                .flatMap(s -> s).distinct().collect(toList());
     }
     
     public enum Days {
