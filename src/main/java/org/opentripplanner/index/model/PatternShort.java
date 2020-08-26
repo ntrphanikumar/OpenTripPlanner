@@ -1,11 +1,12 @@
 package org.opentripplanner.index.model;
 
-import static java.util.EnumSet.allOf;
+import static java.util.EnumSet.*;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -112,7 +113,7 @@ public class PatternShort {
     }
     
     private static Stream<Days> servicedaysStream(ServiceCalendar calendar) {
-        return allOf(Days.class).stream().filter(day -> day.isRunning(calendar));
+        return complementOf(of(Days.NONE)).stream().filter(day -> day.isRunning(calendar));
     }
     
     private static String servicedays(ServiceCalendar calendar) {
