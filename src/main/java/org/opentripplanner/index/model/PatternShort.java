@@ -1,12 +1,12 @@
 package org.opentripplanner.index.model;
 
-import static java.util.EnumSet.*;
+import static java.util.EnumSet.complementOf;
+import static java.util.EnumSet.of;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -54,11 +54,19 @@ public class PatternShort {
             }
         }
         StringBuilder descStr = new StringBuilder("<b>Route:</b> ").append(route);
+        String headSign = null;
         if (from != null) {
+            if(from.contains(" like trip ")) {
+                from = from.split(" like trip ")[0];
+                headSign = pattern.getTrip(0).getTripHeadsign();
+            }
             descStr.append("<br/>").append("<b>From:</b> ").append(from);
         }
         if (to != null) {
             descStr.append("<br/>").append("<b>To:</b> ").append(to);
+        }
+        if (headSign != null) {
+            descStr.append("<br/>").append("<b>Head Sign:</b> ").append(headSign);
         }
         desc = descStr.toString();
         name = desc;
