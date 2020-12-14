@@ -35,7 +35,9 @@
   <!-- Change this to debug to let more messages through. -->
   <root level="info">
     <appender-ref ref="FILE" />
+    <appender-ref ref="stdout" />
   </root>
+  
   <logger name="ch.qos.logback" level="warn"/>
   <logger name="com.amazonaws" level="info"/>
   <logger name="org.apache.http" level="info" />
