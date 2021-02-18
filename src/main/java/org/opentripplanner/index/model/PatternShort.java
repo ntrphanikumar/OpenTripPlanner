@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -93,10 +94,15 @@ public class PatternShort {
     public static Collection<PatternShort> list (Collection<TripPattern> patterns, Map<FeedScopedId, Integer> services, CalendarServiceData csd) {
         Map<Integer, String> serviceCalendars = services.entrySet().stream().collect(toMap(e -> e.getValue(), e -> servicedays(csd.getServiceCalendar(e.getKey()))));
         Map<Integer, Days> serviceStartDay = services.entrySet().stream().collect(toMap(e -> e.getValue(), e -> servicedaysStream(csd.getServiceCalendar(e.getKey())).findFirst().orElse(Days.NONE)));
-        return patterns.stream()
-                .map(pattern -> pattern.getServices().stream().mapToObj(i -> i).sorted((s1, s2) -> serviceStartDay.get(s1).ordinal() - serviceStartDay.get(s2).ordinal())
-                        .map(i -> new PatternShort(pattern, serviceCalendars.get(i))))
-                .flatMap(s -> s).distinct().collect(toList());
+        return patterns.stream().map(pattern -> {
+            IntStream patternServices = pattern.getServices().stream();
+            if (pattern.getServices().size() > 1) {
+                patternServices = patternServices.filter(s -> !Days.NONE.equals(serviceStartDay.get(s)));
+            }
+            return patternServices.mapToObj(i -> i)
+                    .sorted((s1, s2) -> serviceStartDay.get(s1).ordinal() - serviceStartDay.get(s2).ordinal())
+                    .map(i -> new PatternShort(pattern, serviceCalendars.get(i)));
+        }).flatMap(s -> s).distinct().collect(toList());
     }
     
     public enum Days {
